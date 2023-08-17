@@ -1,27 +1,28 @@
-pipeline{
+pipeline {
     agent any
-    triggers { pollSCM('* * * * *') }
+    triggers { pollSCM('*/2 * * * *')}
     stages{
-        stage('get code'){
-            steps{
-               git 'https://github.com/shivakumarkokomuravelly/hello-world.git'
-            }
+        stage('Getting/cloning code from github'){
+           steps{
+               git 'https://github.com/mmislamqa88/hello-world.git'
+           }
+        
         }
-        stage('build code'){
+        
+        stage('Packaging the code'){
             steps{
                 sh 'mvn package'
             }
         }
-        stage('deploy app in tomcat'){
+        
+        stage('Deploying to the tomcat server'){
             steps{
-               sshagent(['fortesting']) {
-    // some block
-
+                sshagent(['myKey']) {
+                    sh "scp -o StrictHostKeyChecking=no webapp/target/webapp.war ubuntu@172.31.89.64:/opt/tomcat/apache-tomcat-10.1.11/webapps"
     
-
-                  sh "scp -o StrictHostKeyChecking=no webapp/target/webapp.war ubuntu@172.31.10.80:/opt/tomcat/apache-tomcat-10.1.11/webapps"   
-}
+                }
             }
         }
+        
     }
-}         
+}
